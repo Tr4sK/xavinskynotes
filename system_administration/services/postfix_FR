@@ -1,0 +1,9 @@
+#######
+POSTFIX
+#######
+
+Remettre les mails deferred dans la queue active:
+	postsuper -r ALL
+
+Puis :
+	postqueue -f
