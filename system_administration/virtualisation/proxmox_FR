@@ -1,0 +1,7 @@
+#######
+PROXMOX
+#######
+
+Interface web:
+	https://ipserveur:8006/
+
