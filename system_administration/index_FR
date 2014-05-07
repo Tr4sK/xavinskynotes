@@ -38,7 +38,7 @@ routage, proxy, reverse proxy
 
 Virtualisation
 --------------
-xen, virtualbox, vmware, Openstack.
+xen, virtualbox, vmware, Openstack, Proxmox.
 
 Architecture
 ------------

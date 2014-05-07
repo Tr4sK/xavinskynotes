@@ -1,0 +1,98 @@
+########
+Fail2ban
+########
+
+Les regex par service:
+	/etc/fail2ban/filter.d/
+
+Les paramètres par défaut:
+	/etc/fail2ban/jail.conf
+
+Les paramètres perso :
+	/etc/fail2ban/jail.local
+
+
+#######
+Proxmox
+#######
+D'abord le regex:
+	/etc/fail2ban/filter.d/proxmox3.conf
+
+	# Author: Tr4sK
+	#
+	
+	[Definition]
+	
+	# Option: failregex
+	# Notes.: regex to match the password failure messages in the logfile. The
+	# host must be matched by a group named "host". The tag "" can
+	# be used for standard IP/hostname matching and is only an alias for
+	# (?:::f{4,6}:)?(?P\S+)
+	# Values: TEXT
+	#
+	
+	failregex = pvedaemon\[.*authentication failure; rhost=<HOST>.*user=.*msg=.*
+	
+	# Option: ignoreregex
+	# Notes.: regex to ignore. If this regex matches, the line is ignored.
+	# Values: TEXT
+	#
+	ignoreregex =
+
+Puis ajouter la config:
+	/etc/fail2ban/jail.local
+
+	##### PROXMOX2: START######
+	[proxmox3]
+	enabled = true
+	port = https,http,8006
+	filter = proxmox3
+	logpath = /var/log/daemon.log
+	maxretry = 5
+	bantime = 86400 #24hours
+	##### PROXMOX2: END######
+
+Puis on test:
+	fail2ban-regex /var/log/daemon.log /etc/fail2ban/filter.d/proxmox3.conf
+
+Status:
+	fail2ban-client status proxmox3
+
+Retirer un ban:
+	iptables -D fail2ban-proxmox3 -s IP -j DROP
+########
+SSH/DDOS
+########
+Config:
+	/etc/fail2ban/jail.local
+	
+	##### SSH: START######
+	[ssh]
+	enables = true
+	port = ssh
+	filter = sshd
+	logpath = /var/log/auth.log
+	maxretry = 5
+	bantime = 86400 #24hours
+	##### SSH: END######
+	
+	##### SSH ANTI-DDOS: START######
+	[ssh-ddos]
+	enabled = true
+	port = ssh
+	filter = sshd-ddos
+	logpath = /var/log/auth.log
+	maxretry = 5
+	##### SSH ANTI-DDOS: END######
+
+Test:
+	fail2ban-regex /var/log/auth.log /etc/fail2ban/filter.d/sshd.conf
+	fail2ban-regex /var/log/auth.log /etc/fail2ban/filter.d/sshd-ddos.conf
+
+Status:
+	fail2ban-client status ssh
+	fail2ban-client status ssh-ddos
+
+Retirer un ban:
+	iptables -D fail2ban-ssh -s IP -j DROP
+	iptables -D fail2ban-ssh-dos -s IP -j DROP
